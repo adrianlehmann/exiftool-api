@@ -3,6 +3,7 @@ const multer = require("multer");
 const { execFile } = require("child_process");
 const fs = require("fs");
 
+const path = require("path");   // <--- add this
 const upload = multer({ dest: "uploads/" });
 const EXIF_PATH = "/app/Image-ExifTool-13.52/exiftool";
 const app = express();
@@ -44,6 +45,7 @@ app.post("/exif", upload.single("file"), (req, res) => {
     }
 
     // Send the modified file as the response
+    res.setHeader("Content-Type", "image/jpeg");
     res.setHeader("Content-Disposition", `attachment; filename="${req.body.filename || "image.jpg"}"`);
     res.sendFile(path.resolve(filePath), (sendErr) => {
       // Clean up after sending
