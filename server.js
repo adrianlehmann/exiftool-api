@@ -4,12 +4,13 @@ const { execFile } = require("child_process");
 const fs = require("fs");
 
 const upload = multer({ dest: "uploads/" });
+const EXIF_PATH = "/app/Image-ExifTool-13.52/exiftool";
 const app = express();
 
 app.post("/exif", upload.single("file"), (req, res) => {
   const filePath = req.file.path;
 
-  execFile("exiftool", ["-json", filePath], (err, stdout) => {
+  execFile(EXIF_PATH, ["-json", filePath], (err, stdout) => {
 
     fs.unlinkSync(filePath);
 
