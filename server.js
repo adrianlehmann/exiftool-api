@@ -44,7 +44,7 @@ app.post("/exif", upload.single("file"), (req, res) => {
     }
 
     // Send the modified file as the response
-    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Content-Disposition", `attachment; filename="${req.body.filename || "image.jpg"}"`);
     res.sendFile(path.resolve(filePath), (sendErr) => {
       // Clean up after sending
       fs.unlinkSync(filePath);
