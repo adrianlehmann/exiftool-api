@@ -27,7 +27,7 @@ app.post("/exif", upload.single("file"), (req, res) => {
 app.post("/exif", upload.single("file"), (req, res) => {
   const filePath = req.file.path;
 
-  const args = ["-overwrite_original", "-all="]; // wipe all existing metadata
+  const args = ["-overwrite_original"]; // wipe all existing metadata
 
   // Convert body fields to ExifTool arguments
   for (const [key, value] of Object.entries(req.body)) {
