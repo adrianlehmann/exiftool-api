@@ -29,33 +29,30 @@ app.post("/exif", upload.single("file"), (req, res) => {
 
   const args = ["-overwrite_original"];
 
-  // convert body fields to exiftool args
+  // Convert body fields to ExifTool arguments
   for (const [key, value] of Object.entries(req.body)) {
     args.push(`-${key}=${value}`);
   }
 
   args.push(filePath);
 
+  // Write metadata
   execFile(EXIF_PATH, args, (err) => {
-
     if (err) {
       fs.unlinkSync(filePath);
       return res.status(500).send(err.message);
     }
 
-    execFile(EXIF_PATH, ["-json", filePath], (err2, stdout) => {
-
+    // Send the modified file as the response
+    res.setHeader("Content-Type", "image/jpeg");
+    res.sendFile(path.resolve(filePath), (sendErr) => {
+      // Clean up after sending
       fs.unlinkSync(filePath);
 
-      if (err2) {
-        return res.status(500).send(err2.message);
+      if (sendErr) {
+        console.error("Error sending file:", sendErr);
       }
-
-      const result = JSON.parse(stdout);
-      res.json(result[0]);
-
     });
-
   });
 });
 
