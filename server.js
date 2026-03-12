@@ -25,6 +25,14 @@ app.post("/exif", upload.single("file"), (req, res) => {
 });
 */
 
+const cleanup = () => {
+  fs.unlink(filePath, (err) => {
+    if (err && err.code !== "ENOENT") {
+      console.error("Cleanup error:", err);
+    }
+  });
+};
+
 app.post("/exif", upload.single("file"), (req, res) => {
   const filePath = req.file.path;
 
@@ -40,7 +48,7 @@ app.post("/exif", upload.single("file"), (req, res) => {
   // Write metadata
   execFile(EXIF_PATH, args, (err) => {
     if (err) {
-      fs.unlinkSync(filePath);
+      cleanup();
       return res.status(500).send(err.message);
     }
 
@@ -49,7 +57,7 @@ app.post("/exif", upload.single("file"), (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename="${req.body.newFilename || "image.jpg"}"`);
     res.sendFile(path.resolve(filePath), (sendErr) => {
       // Clean up after sending
-      fs.unlinkSync(filePath);
+      cleanup();
 
       if (sendErr) {
         console.error("Error sending file:", sendErr);
