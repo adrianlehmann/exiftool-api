@@ -35,6 +35,7 @@ const cleanup = () => {
 
 app.post("/exif", upload.single("file"), (req, res) => {
   const filePath = req.file.path;
+  const ext = path.extname(req.file.originalname) || ".jpg";  
 
   const args = ["-all=", "-overwrite_original"]; // wipe all existing metadata
 
@@ -53,8 +54,9 @@ app.post("/exif", upload.single("file"), (req, res) => {
     }
 
     // Send the modified file as the response
-    res.setHeader("Content-Type", "image/jpeg");
-    res.setHeader("Content-Disposition", `attachment; filename="${req.body.newFilename || "image.jpg"}"`);
+    res.setHeader("Content-Type", req.file.mimetype);
+    const filename = req.body.newFilename || `image${ext}`;
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.sendFile(path.resolve(filePath), (sendErr) => {
       // Clean up after sending
       cleanup();
